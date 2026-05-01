@@ -1,0 +1,9 @@
+#Mongo
+.db
+
+#Ptyhon
+__pycache__/
+
+
+#Enviornment vars
+.env
