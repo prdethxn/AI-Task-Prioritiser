@@ -1,5 +1,9 @@
-import uuid #Used To Give Each Task A Custom ID.
-from datetime import datetime #Used To Automatically Allocate Timestamps For Each Task 
+import uuid
+import os
+from datetime import datetime 
+from pymongo import MongoClient
+from dotenv import load_dotenv
+load_dotenv()
 
 class Task:
     def __init__(self,title,description,priority,status):
@@ -34,6 +38,26 @@ class Task:
                 f"Status:  {self.status} \n" 
                 f"Timestamps {self.timestamps} \n")
 
+class TaskManager:
+    def __init__(self):
+        self.uri = os.getenv("MONGODB_URI")
+        self.db_name = os.getenv("DB_NAME")
+        self.client = MongoClient(self.uri)
+        self.db = self.client[self.db_name]
+        self.collection = self.db["Tasks"]
 
-
+    def add_task(self,task):
+        return self.collection.insert_one(task.to_dict())
         
+    def get_all_tasks(self):
+        return [Task.from_dict(task) for task in self.collection.find({})]
+
+    def delete_task(self,id):
+        return self.collection.delete_one({"id": id})
+
+    #Update the status of a task
+    def update_status(self, id, newStatus):
+        self.collection.update_one(
+            {"id": id},
+            {"$set": {"status": newStatus}}
+        )
