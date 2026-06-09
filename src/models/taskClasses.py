@@ -3,6 +3,8 @@ import os
 from datetime import datetime 
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from pymongo.errors import DuplicateKeyError, PyMongoError
+
 load_dotenv()
 
 class Task:
@@ -50,17 +52,54 @@ class TaskManager:
         self.collection = self.db["Tasks"]
 
     def add_task(self,task):
-        return self.collection.insert_one(task.to_dict())
+        try:
+            return self.collection.insert_one(task.to_dict())
+        except DuplicateKeyError as dke:
+            print(f"Failed to add task: task already exists. {dke}")
+            raise
+        except PyMongoError as pe:
+            print(f"Failed to connect to database: {pe}")
+            raise
+        except Exception as e:
+            print(f"Client-side error occured: {e}")
+            raise
         
     def get_all_tasks(self):
-        return [Task.from_dict(task) for task in self.collection.find({})]
+        try:
+            outcome = [Task.from_dict(task) for task in self.collection.find({})]
+            if not outcome: #If tasks aren't found in the database, throw an exception.
+                raise ValueError("Error: Task cannot be found")
+            return outcome
+        
+        except ValueError as mi:
+            print(f"Failed to get task: task doesn't exist {mi}")
+            raise
+        except PyMongoError as pe:
+            print(f"Failed to connect to database: {pe}")
+            raise
+        except Exception as e:
+            print(f"Client-side error occured: {e}")
+            raise
 
     def delete_task(self,id):
-        return self.collection.delete_one({"id": id})
+        result = self.collection.delete_one({"id": id})
+        if result.deleted_count == 0: #check if task was actually deleted
+            raise ValueError(f"No task found with ID: {id}")
+        print(f"Task {id} deleted sucessfully")
+
+        except ValueError as ve:
+            print(f"Failed to delete task: {ve}")
+            raise
+        except PyMongoError as pe:
+            print(f"Failed to connect to database: {pe}")
+            raise
+        except Exception as e:
+            print(f"Client-side error occured: {e}")
+            raise
+        return result
 
     #Update the status of a task
     def update_status(self, id, newStatus):
         self.collection.update_one(
             {"id": id},
-            {"$set": {"status": newStatus}}
-        )
+            {"$set": {"status": newStatus}})
