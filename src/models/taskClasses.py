@@ -18,6 +18,9 @@ class Task:
     #Turn A Task Objects Into A Dictionary, So It Can Be Stored In MongoDB.
     def to_dict(self):
         return {"id": self.id, "title": self.title, "description": self.description, "priority": self.priority, "status": self.status, "timestamps": self.timestamps}
+    
+    def setPriority(self,newPriority):
+        self.priority = newPriority
 
 
     #Convert A Dict Into A Task Object. This Is Used To Turn Tasks Stored In MongoDB Into Task Objects.
