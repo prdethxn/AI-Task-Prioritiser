@@ -28,10 +28,10 @@ class Task:
     #Convert A Dict Into A Task Object. This Is Used To Turn Tasks Stored In MongoDB Into Task Objects.
     @classmethod
     def from_dict(cls, data):
-        Task = cls(title = data["title"], description = data["description"], priority = data["priority"], status = data["status"]) 
-        Task.timestamps = data["timestamps"]
-        Task.id = data["id"]
-        return Task
+        task = cls(title = data["title"], description = data["description"], priority = data["priority"], status = data["status"]) 
+        task.timestamps = data["timestamps"]
+        task.id = data["id"]
+        return task
      
         
     #Return Task Objects Into A Neatly Fromatted String For the CLI.
@@ -72,7 +72,7 @@ class TaskManager:
             return outcome
         
         except ValueError as mi:
-            print(f"Failed to get task: task doesn't exist {mi}")
+            print(mi)
             raise
         except PyMongoError as pe:
             print(f"Failed to connect to database: {pe}")
@@ -82,13 +82,15 @@ class TaskManager:
             raise
 
     def delete_task(self,id):
-        result = self.collection.delete_one({"id": id})
-        if result.deleted_count == 0: #check if task was actually deleted
-            raise ValueError(f"No task found with ID: {id}")
-        print(f"Task {id} deleted sucessfully")
+        try:
+            result = self.collection.delete_one({"id": id})
+            if result.deleted_count == 0: #check if task was actually deleted
+                raise ValueError(f"No task found with ID: {id}")
+            print(f"Task {id} deleted sucessfully")
+            return result
 
         except ValueError as ve:
-            print(f"Failed to delete task: {ve}")
+            print(ve)
             raise
         except PyMongoError as pe:
             print(f"Failed to connect to database: {pe}")
@@ -96,10 +98,24 @@ class TaskManager:
         except Exception as e:
             print(f"Client-side error occured: {e}")
             raise
-        return result
+        
 
     #Update the status of a task
     def update_status(self, id, newStatus):
-        self.collection.update_one(
+        try:
+            result = self.collection.update_one(
             {"id": id},
             {"$set": {"status": newStatus}})
+
+            if result.matched_count == 0: #throw an error if the targeted task doesn't exist
+                raise ValueError(f"Failed to update task with id: {id}")
+            return result
+        except ValueError as ve:
+            print(ve)
+            raise
+        except PyMongoError as pe:
+            print(f"Failed to connect to database: {pe}")
+            raise
+        except Exception as e:
+            print(f"Client-side error occured: {e}")
+            raise
