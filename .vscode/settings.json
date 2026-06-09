@@ -1,0 +1,7 @@
+{
+    "cmake.additionalBuildProblemMatchers": [
+
+    ]
+
+    "python.analysis.extraPaths": ["./src"]
+}
