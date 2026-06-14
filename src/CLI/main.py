@@ -12,10 +12,10 @@ def add_task(task_manager,analyser):
             newTask = Task(title.strip(),description.strip())
             analyser.prioritise_task(newTask)
             task_manager.add_task(newTask)
-            print(f"The Following Task Has Been Added: {newTask} ")
+            print(f"The Following Task Has Been Added: {newTask} \n")
             break
         except ValueError:
-            print("Invalid Input(s), Try Again")
+            print("Invalid Input(s), Try Again\n")
 
 
 def view_tasks(task_manager,getPending = False):
@@ -27,26 +27,26 @@ def delete(task_manager):
     try:
         id = input("Enter the task ID: ")
         task_manager.delete_task(id)
-        print(f"Task With {id} Was Deleted")
+        print(f"Task With {id} Was Deleted\n")
     except ValueError:
-        print("Invalid Input. Try again")
+        print("Invalid Input. Try again\n")
     
 def complete_task(task_manager):
     try:
         id = input("Enter the task ID: ")
         task_manager.update_status(id,"Completed")
-        print(f"Task With {id} Was Completed")
+        print(f"Task With {id} Was Completed\n")
 
             
     except ValueError:
-        print("Invalid Input. Try again")
+        print("Invalid Input. Try again\n")
 
 def reprioritise_tasks(task_manager,ai_analyser):
     all_tasks = task_manager.get_tasks()
     ai_analyser.prioritise_all(all_tasks)
     for task in all_tasks:
         task_manager.update_priority(task.id,task.priority)
-    print("Tasks Have Been Sucessfully Reprioritised")
+    print("Tasks Have Been Sucessfully Reprioritised\n")
 
 def summarise_tasks(task_manager,ai_analyser):
     pending_tasks = task_manager.get_tasks(True)
@@ -85,7 +85,7 @@ def main():
             elif choice == 8:
                 running = False
         except:
-            print("Invalid Input, Try again")
+            print("Invalid Input, Try again\n")
 
 
 if __name__ == "__main__":
