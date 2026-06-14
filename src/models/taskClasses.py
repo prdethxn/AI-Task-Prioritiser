@@ -5,10 +5,10 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from pymongo.errors import DuplicateKeyError, PyMongoError
 
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 
 class Task:
-    def __init__(self,title,description,priority = "null",status = "pending"):
+    def __init__(self,title,description,priority = "unassigned",status = "pending"):
         self.title = title
         self.description = description
         self.priority = priority

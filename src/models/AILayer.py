@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import threading
 from concurrent.futures import ThreadPoolExecutor
 #Load vatiables from the .env file
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 
 class AIAnalyser:
 
@@ -28,7 +28,7 @@ class AIAnalyser:
 
 
 
-    def prioritiseTask(self,task): #Set the priority for a single task. Helps achieve multi-threading.
+    def prioritise_task(self,task): #Set the priority for a single task. Helps achieve multi-threading.
         prompt = (f"Prioritise the task based on the information (return the existing priority, only if one is present). Reply with one word only; that being the priority: {task}")
         try:
             chat = self.client.chats.create(model = self.model_name)
@@ -44,14 +44,14 @@ class AIAnalyser:
 
     #Based on tasks details, get the AI to prioritise it. 
     #Sending one message at a time is slow, so we use multi-threading to concurrently prioritise multiple tasks
-    def prioritise(self,tasks):
+    def prioritise_all(self,tasks):
         with ThreadPoolExecutor(max_workers = 4) as executor: #Only prioritise 4 tasks at a time to respect Gemini's API rate limiting.
-             executor.map(self.prioritiseTask,tasks)
+             executor.map(self.prioritise_task,tasks)
             
     
     def summarise(self,pendingTasks): #Print out a summary for pending task.
         try:
-            taskInfo = "\n".join(f"- {task}" for task in pendingTasks) #Make a list contaning the info fro each task.
+            taskInfo = "\n".join(f"- {task}" for task in pendingTasks) #Make a list contaning the info for each task.
             prompt = (f"Provide a clear, neat summary of each task, based on the information provided: \n {taskInfo}")
             response = self.client.models.generate_content(model=self.model_name,contents=prompt)
             print(response.text)

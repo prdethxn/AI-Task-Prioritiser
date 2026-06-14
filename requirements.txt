@@ -1,7 +1,5 @@
 pymongo
-
 python-dotenv
-click
 pytest
 google-genai
 
