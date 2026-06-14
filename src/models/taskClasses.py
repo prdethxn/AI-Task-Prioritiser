@@ -8,7 +8,7 @@ from pymongo.errors import DuplicateKeyError, PyMongoError
 load_dotenv()
 
 class Task:
-    def __init__(self,title,description,priority,status):
+    def __init__(self,title,description,priority = "null",status = "pending"):
         self.title = title
         self.description = description
         self.priority = priority
@@ -64,9 +64,13 @@ class TaskManager:
             print(f"Client-side error occured: {e}")
             raise
         
-    def get_all_tasks(self):
+    def get_tasks(self, getPending = False): #either get all tasks, or ones that don't have a status yet.
+    
         try:
-            outcome = [Task.from_dict(task) for task in self.collection.find({})]
+            if getPending:
+                outcome = [Task.from_dict(task) for task in self.collection.find({"status": "pending"})]
+            else:
+                outcome = [Task.from_dict(task) for task in self.collection.find({})]
             if not outcome: #If tasks aren't found in the database, throw an exception.
                 raise ValueError("Error: Task cannot be found")
             return outcome
@@ -80,6 +84,8 @@ class TaskManager:
         except Exception as e:
             print(f"Client-side error occured: {e}")
             raise
+
+   
 
     def delete_task(self,id):
         try:
