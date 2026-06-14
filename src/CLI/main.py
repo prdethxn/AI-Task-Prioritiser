@@ -20,7 +20,7 @@ def add_task(task_manager,analyser):
 
 def view_tasks(task_manager,getPending = False):
     myTasks = task_manager.get_tasks(getPending)
-    print(*myTasks, sep="\n----\n")
+    print(*myTasks, sep="\n---------------------------------------------------\n")
 
 
 def delete(task_manager):
@@ -44,6 +44,9 @@ def complete_task(task_manager):
 def reprioritise_tasks(task_manager,ai_analyser):
     all_tasks = task_manager.get_tasks()
     ai_analyser.prioritise_all(all_tasks)
+    for task in all_tasks:
+        task_manager.update_priority(task.id,task.priority)
+    print("Tasks Have Been Sucessfully Reprioritised")
 
 def summarise_tasks(task_manager,ai_analyser):
     pending_tasks = task_manager.get_tasks(True)

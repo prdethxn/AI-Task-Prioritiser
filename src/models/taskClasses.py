@@ -21,10 +21,10 @@ class Task:
     def to_dict(self):
         return {"id": self.id, "title": self.title, "description": self.description, "priority": self.priority, "status": self.status, "timestamps": self.timestamps}
     
-    def setPriority(self,newPriority):
-        self.priority = newPriority
-
-
+    def set_priority(self,priority):
+        self.priority = priority
+    
+   
     #Convert A Dict Into A Task Object. This Is Used To Turn Tasks Stored In MongoDB Into Task Objects.
     @classmethod
     def from_dict(cls, data):
@@ -125,3 +125,26 @@ class TaskManager:
         except Exception as e:
             print(f"Client-side error occured: {e}")
             raise
+
+   
+    def update_priority(self, id, newPriority):
+        try:
+            result = self.collection.update_one(
+            {"id": id},
+            {"$set": {"priority": newPriority}})
+
+            if result.matched_count == 0: #throw an error if the targeted task doesn't exist
+                raise ValueError(f"Failed to update task with id: {id}")
+            return result
+        except ValueError as ve:
+            print(ve)
+            raise
+        except PyMongoError as pe:
+            print(f"Failed to connect to database: {pe}")
+            raise
+        except Exception as e:
+            print(f"Client-side error occured: {e}")
+            raise
+    
+    
+  

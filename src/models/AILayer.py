@@ -4,9 +4,8 @@ from google import genai
 from google.genai import types
 from google.genai.errors import APIError
 from dotenv import load_dotenv
-import threading
 from concurrent.futures import ThreadPoolExecutor
-#Load vatiables from the .env file
+#Load variables from the .env file
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 
 class AIAnalyser:
@@ -33,7 +32,7 @@ class AIAnalyser:
         try:
             chat = self.client.chats.create(model = self.model_name)
             response = chat.send_message(prompt)
-            task.setPriority(response.text)
+            task.set_priority(response.text)
         except APIError as ae:
             print(f"API error occured: {ae}")
             raise
