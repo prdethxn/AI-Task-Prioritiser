@@ -38,10 +38,10 @@ class Task:
     def __str__(self):
         return (f"ID: {self.id} \n" 
                 f"Task Name: {self.title} \n"
-                f"Description:  {self.description} \n" 
-                f"Priority:  {self.priority} \n" 
-                f"Status:  {self.status} \n" 
-                f"Timestamps {self.timestamps} \n")
+                f"Description: {self.description} \n" 
+                f"Priority: {self.priority} \n" 
+                f"Status: {self.status} \n" 
+                f"Timestamps: {self.timestamps} \n")
 
 class TaskManager:
     def __init__(self):
@@ -64,8 +64,7 @@ class TaskManager:
             print(f"Client-side error occured: {e}")
             raise
         
-    def get_tasks(self, getPending = False): #either get all tasks, or ones that don't have a status yet.
-    
+    def get_tasks(self, getPending = False): #either get all tasks, or ones that are pending. 
         try:
             if getPending:
                 outcome = [Task.from_dict(task) for task in self.collection.find({"status": "pending"})]
@@ -74,7 +73,6 @@ class TaskManager:
             if not outcome: #If tasks aren't found in the database, throw an exception.
                 raise ValueError("Error: Task cannot be found")
             return outcome
-        
         except ValueError as mi:
             print(mi)
             raise
@@ -85,8 +83,6 @@ class TaskManager:
             print(f"Client-side error occured: {e}")
             raise
 
-   
-
     def delete_task(self,id):
         try:
             result = self.collection.delete_one({"id": id})
@@ -94,7 +90,6 @@ class TaskManager:
                 raise ValueError(f"No task found with ID: {id}")
             print(f"Task {id} deleted sucessfully")
             return result
-
         except ValueError as ve:
             print(ve)
             raise
@@ -112,7 +107,6 @@ class TaskManager:
             result = self.collection.update_one(
             {"id": id},
             {"$set": {"status": newStatus}})
-
             if result.matched_count == 0: #throw an error if the targeted task doesn't exist
                 raise ValueError(f"Failed to update task with id: {id}")
             return result
@@ -132,7 +126,6 @@ class TaskManager:
             result = self.collection.update_one(
             {"id": id},
             {"$set": {"priority": newPriority}})
-
             if result.matched_count == 0: #throw an error if the targeted task doesn't exist
                 raise ValueError(f"Failed to update task with id: {id}")
             return result
