@@ -1,7 +1,7 @@
 from pymongo.errors import DuplicateKeyError, PyMongoError
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../src'))
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 from models.TaskClasses import TaskManager, Task
 import pytest
 from unittest.mock import MagicMock, patch
