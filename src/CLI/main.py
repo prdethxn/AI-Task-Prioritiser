@@ -1,15 +1,19 @@
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from models.AILayer import AIAnalyser
-from models.TaskClasses import Task, TaskManager
+
+from models.AILayer import AIAnalyser  # noqa: E402
+from models.TaskClasses import Task, TaskManager  # noqa: E402
 
 
-def add_task(task_manager,analyser):
+def add_task(task_manager, analyser):
     while True:
         try:
-            title,description = input("Enter the task title and description (seperated by a comma): ").split(",")
-            newTask = Task(title.strip(),description.strip())
+            title, description = input(
+                "Enter the task title and description (separated by a comma): "
+            ).split(",")
+            newTask = Task(title.strip(), description.strip())
             analyser.prioritise_task(newTask)
             task_manager.add_task(newTask)
             print(f"The Following Task Has Been Added: {newTask} \n")
@@ -18,74 +22,82 @@ def add_task(task_manager,analyser):
             print("Invalid Input(s), Try Again\n")
 
 
-def view_tasks(task_manager,getPending = False):
+def view_tasks(task_manager, getPending=False):
     myTasks = task_manager.get_tasks(getPending)
     print(*myTasks, sep="\n---------------------------------------------------\n")
 
 
 def delete(task_manager):
     try:
-        id = input("Enter the task ID: ")
+        id = input("Enter the task ID: ").strip()
         task_manager.delete_task(id)
         print(f"Task With {id} Was Deleted\n")
     except ValueError:
         print("Invalid Input. Try again\n")
-    
+
+
 def complete_task(task_manager):
     try:
-        id = input("Enter the task ID: ")
-        task_manager.update_status(id,"Completed")
+        id = input("Enter the task ID: ").strip()
+        task_manager.update_status(id, "Completed")
         print(f"Task With {id} Was Completed\n")
-
-            
     except ValueError:
         print("Invalid Input. Try again\n")
 
-def reprioritise_tasks(task_manager,ai_analyser):
+
+def reprioritise_tasks(task_manager, ai_analyser):
     all_tasks = task_manager.get_tasks()
     ai_analyser.prioritise_all(all_tasks)
     for task in all_tasks:
-        task_manager.update_priority(task.id,task.priority)
-    print("Tasks Have Been Sucessfully Reprioritised\n")
+        task_manager.update_priority(task.id, task.priority)
+    print("Tasks Have Been Successfully Reprioritised\n")
 
-def summarise_tasks(task_manager,ai_analyser):
+
+def summarise_tasks(task_manager, ai_analyser):
     pending_tasks = task_manager.get_tasks(True)
     ai_analyser.summarise(pending_tasks)
-    
+
 
 def main():
     manager = TaskManager()
     analyser = AIAnalyser()
     running = True
     options = [
-        "1. Create A New Task", "2. View All Tasks", "3. View Pending Tasks", "4. Delete A Task", "5. Complete A Task",
-        "6. Re-prioritise All Tasks",  "7. Summarise All Tasks", "8. Exit"
+        "1. Create A New Task",
+        "2. View All Tasks",
+        "3. View Pending Tasks",
+        "4. Delete A Task",
+        "5. Complete A Task",
+        "6. Re-prioritise All Tasks",
+        "7. Summarise All Tasks",
+        "8. Exit"
     ]
     while running:
         print("======= AI Task Prioritiser =======")
         print(*options, sep="\n")
         print("==============")
-
         try:
             choice = int(input("Select An Option: "))
             if choice == 1:
-                add_task(manager,analyser)
+                add_task(manager, analyser)
             elif choice == 2:
                 view_tasks(manager)
             elif choice == 3:
-                view_tasks(manager,True)
+                view_tasks(manager, True)
             elif choice == 4:
                 delete(manager)
             elif choice == 5:
                 complete_task(manager)
             elif choice == 6:
-                reprioritise_tasks(manager,analyser)
+                reprioritise_tasks(manager, analyser)
             elif choice == 7:
                 summarise_tasks(manager, analyser)
             elif choice == 8:
                 running = False
-        except:
-            print("Invalid Input, Try again\n")
+        except ValueError:
+            print("Invalid option, please enter a number between 1-8\n")
+        except Exception as e:
+            print(f"Something went wrong: {e}\n")
 
 
 if __name__ == "__main__":

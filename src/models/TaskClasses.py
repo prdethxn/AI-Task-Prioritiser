@@ -1,14 +1,15 @@
 import uuid
 import os
-from datetime import datetime 
+from datetime import datetime
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from pymongo.errors import DuplicateKeyError, PyMongoError
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 
+
 class Task:
-    def __init__(self,title,description,priority = "unassigned",status = "pending"):
+    def __init__(self, title, description, priority="unassigned", status="pending"):
         self.title = title
         self.description = description
         self.priority = priority
@@ -16,32 +17,44 @@ class Task:
         self.timestamps = datetime.now().isoformat()
         self.id = str(uuid.uuid4())
 
-
-    #Turn A Task Objects Into A Dictionary, So It Can Be Stored In MongoDB.
+    # Turn A Task Object Into A Dictionary, So It Can Be Stored In MongoDB.
     def to_dict(self):
-        return {"id": self.id, "title": self.title, "description": self.description, "priority": self.priority, "status": self.status, "timestamps": self.timestamps}
-    
-    def set_priority(self,priority):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "priority": self.priority,
+            "status": self.status,
+            "timestamps": self.timestamps
+        }
+
+    def set_priority(self, priority):
         self.priority = priority
-    
-   
-    #Convert A Dict Into A Task Object. This Is Used To Turn Tasks Stored In MongoDB Into Task Objects.
+
+    # Convert A Dict Into A Task Object.
     @classmethod
     def from_dict(cls, data):
-        task = cls(title = data["title"], description = data["description"], priority = data["priority"], status = data["status"]) 
+        task = cls(
+            title=data["title"],
+            description=data["description"],
+            priority=data["priority"],
+            status=data["status"]
+        )
         task.timestamps = data["timestamps"]
         task.id = data["id"]
         return task
-     
-        
-    #Return Task Objects Into A Neatly Fromatted String For the CLI.
+
+    # Return Task Object As A Formatted String For The CLI.
     def __str__(self):
-        return (f"ID: {self.id} \n" 
-                f"Task Name: {self.title} \n"
-                f"Description: {self.description} \n" 
-                f"Priority: {self.priority} \n" 
-                f"Status: {self.status} \n" 
-                f"Timestamps: {self.timestamps} \n")
+        return (
+            f"ID: {self.id} \n"
+            f"Task Name: {self.title} \n"
+            f"Description: {self.description} \n"
+            f"Priority: {self.priority} \n"
+            f"Status: {self.status} \n"
+            f"Timestamps: {self.timestamps} \n"
+        )
+
 
 class TaskManager:
     def __init__(self):
@@ -51,7 +64,7 @@ class TaskManager:
         self.db = self.client[self.db_name]
         self.collection = self.db["Tasks"]
 
-    def add_task(self,task):
+    def add_task(self, task):
         try:
             return self.collection.insert_one(task.to_dict())
         except DuplicateKeyError as dke:
@@ -61,16 +74,22 @@ class TaskManager:
             print(f"Failed to connect to database: {pe}")
             raise
         except Exception as e:
-            print(f"Client-side error occured: {e}")
+            print(f"Client-side error occurred: {e}")
             raise
-        
-    def get_tasks(self, getPending = False): #either get all tasks, or ones that are pending. 
+
+    def get_tasks(self, getPending=False):
         try:
             if getPending:
-                outcome = [Task.from_dict(task) for task in self.collection.find({"status": "pending"})]
+                outcome = [
+                    Task.from_dict(task)
+                    for task in self.collection.find({"status": "pending"})
+                ]
             else:
-                outcome = [Task.from_dict(task) for task in self.collection.find({})]
-            if not outcome: #If tasks aren't found in the database, throw an exception.
+                outcome = [
+                    Task.from_dict(task)
+                    for task in self.collection.find({})
+                ]
+            if not outcome:
                 raise ValueError("Error: Task cannot be found")
             return outcome
         except ValueError as mi:
@@ -80,15 +99,15 @@ class TaskManager:
             print(f"Failed to connect to database: {pe}")
             raise
         except Exception as e:
-            print(f"Client-side error occured: {e}")
+            print(f"Client-side error occurred: {e}")
             raise
 
-    def delete_task(self,id):
+    def delete_task(self, id):
         try:
             result = self.collection.delete_one({"id": id})
-            if result.deleted_count == 0: #check if task was actually deleted
+            if result.deleted_count == 0:
                 raise ValueError(f"No task found with ID: {id}")
-            print(f"Task {id} deleted sucessfully")
+            print(f"Task {id} deleted successfully")
             return result
         except ValueError as ve:
             print(ve)
@@ -97,17 +116,17 @@ class TaskManager:
             print(f"Failed to connect to database: {pe}")
             raise
         except Exception as e:
-            print(f"Client-side error occured: {e}")
+            print(f"Client-side error occurred: {e}")
             raise
-        
 
-    #Update the status of a task
+    # Update the status of a task
     def update_status(self, id, newStatus):
         try:
             result = self.collection.update_one(
-            {"id": id},
-            {"$set": {"status": newStatus}})
-            if result.matched_count == 0: #throw an error if the targeted task doesn't exist
+                {"id": id},
+                {"$set": {"status": newStatus}}
+            )
+            if result.matched_count == 0:
                 raise ValueError(f"Failed to update task with id: {id}")
             return result
         except ValueError as ve:
@@ -117,16 +136,16 @@ class TaskManager:
             print(f"Failed to connect to database: {pe}")
             raise
         except Exception as e:
-            print(f"Client-side error occured: {e}")
+            print(f"Client-side error occurred: {e}")
             raise
 
-   
     def update_priority(self, id, newPriority):
         try:
             result = self.collection.update_one(
-            {"id": id},
-            {"$set": {"priority": newPriority}})
-            if result.matched_count == 0: #throw an error if the targeted task doesn't exist
+                {"id": id},
+                {"$set": {"priority": newPriority}}
+            )
+            if result.matched_count == 0:
                 raise ValueError(f"Failed to update task with id: {id}")
             return result
         except ValueError as ve:
@@ -136,8 +155,5 @@ class TaskManager:
             print(f"Failed to connect to database: {pe}")
             raise
         except Exception as e:
-            print(f"Client-side error occured: {e}")
+            print(f"Client-side error occurred: {e}")
             raise
-    
-    
-  
