@@ -35,3 +35,19 @@ Fill in `.env` with your Gemini API key, MongoDB URI, and database name.
 ```bash
 python3 src/CLI/main.py
 ```
+
+## Usage
+======= AI Task Prioritiser =======
+1. Create A New Task
+....
+
+When adding a task, Gemini will automatically assign a priority based on the task description.
+
+## Running Unit Tests & CI/CD
+
+```bash
+pytest tests/
+```
+
+28 unit tests cover the Task, TaskManager, and AIAnalyser classes with mocked API and database responses, ensuring all code is functional.
+GitHub Actions installs dependencies and runs all tests on every push to main and on every pull request, ensuring only functional code reaches the main repository.
