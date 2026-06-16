@@ -25,8 +25,6 @@ class AIAnalyser:
             print(f"An unknown error occured: {e}")
             raise
 
-
-
     def prioritise_task(self,task): #Set the priority for a single task. Helps achieve multi-threading.
         prompt = (f"Prioritise the task based on the information (return the existing priority, only if one is present). Reply with one word only; that being the priority: {task}")
         try:
@@ -39,7 +37,6 @@ class AIAnalyser:
         except Exception as e:
             print(f"Client side error: {e}")
             raise
-
 
     #Based on tasks details, get the AI to prioritise it. 
     #Sending one message at a time is slow, so we use multi-threading to concurrently prioritise multiple tasks
