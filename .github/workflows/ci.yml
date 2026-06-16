@@ -8,10 +8,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Python setup
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -20,6 +20,8 @@ jobs:
 
       - name: Run Unit Tests
         run: pytest tests/
+        env:
+          PYTHONPATH: src
 
       - name: Run Linting
         run: flake8 src/ tests/
